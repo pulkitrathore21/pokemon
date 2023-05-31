@@ -4,7 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from . import db
 
 
-
 @dataclass
 class Pokemon(db.Model):
     print("start db")

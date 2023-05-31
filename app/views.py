@@ -14,54 +14,50 @@ class PokemonException(Exception):
         self.message = message
         self.code = code
 
+
 @pokemonapi.errorhandler(Exception)
 def handle_exception(e):
     return {"success": False, "error": str(e)}, 400
 
 
-
 def load_json():
     with open("pokemon_data.json") as f:
-        data=json.load(f)
-        check_in_db=Pokemon.query.all()
+        data = json.load(f)
+        check_in_db = Pokemon.query.all()
         if not check_in_db:
-            
-            
             for item in data:
                 pokemon = Pokemon(
-                        rank=item.get("#"),
-                        name=item.get("Name"),
-                        type_1=item.get("Type 1"),
-                        type_2=item.get("Type 2"),
-                        total=item.get("Total"),
-                        HP=item.get("HP"),
-                        attack=item.get("Attack"),
-                        Defense=item.get("Defense"),
-                        sp_atk=item.get("Sp. Atk"),
-                        sp_def=item.get("Sp. Def"),
-                        speed=item.get("Speed"),
-                        generation=item.get("Generation"),
-                        legendary=item.get("Legendary")
-                        )
+                    rank=item.get("#"),
+                    name=item.get("Name"),
+                    type_1=item.get("Type 1"),
+                    type_2=item.get("Type 2"),
+                    total=item.get("Total"),
+                    HP=item.get("HP"),
+                    attack=item.get("Attack"),
+                    Defense=item.get("Defense"),
+                    sp_atk=item.get("Sp. Atk"),
+                    sp_def=item.get("Sp. Def"),
+                    speed=item.get("Speed"),
+                    generation=item.get("Generation"),
+                    legendary=item.get("Legendary"),
+                )
                 db.session.add(pokemon)
                 db.session.commit()
-            return jsonify({"success":True,"message":"data inserted successfully"})
-        raise PokemonException(f"Some data present in db",400)
+            return jsonify({"success": True, "message": "data inserted successfully"})
+        raise PokemonException(f"Some data present in db", 400)
 
 
-@pokemonapi.route("/load-json",methods=["POST"])
+@pokemonapi.route("/load-json", methods=["POST"])
 def load_into_db():
-    res=load_json()
+    res = load_json()
     return res
-    
 
-@pokemonapi.route("/delete-record",methods=["DELETE"])
+
+@pokemonapi.route("/delete-record", methods=["DELETE"])
 def delete_all_rows():
     db.session.query(Pokemon).delete()
     db.session.commit()
-    return {"success":True}
-
-
+    return {"success": True}
 
 
 @pokemonapi.route("/new", methods=["POST"])
@@ -136,8 +132,8 @@ def new_pokemon():
 # @pokemonapi.route("/<legendary>",methods=["GET"])
 def view(pokemon_name=None):
     search = None
-    legendary=None
-    generation=None
+    legendary = None
+    generation = None
     # rank=None
     sort = request.args.get("sort", "name")
     order = request.args.get("order", "desc")
@@ -145,11 +141,13 @@ def view(pokemon_name=None):
     page_num = request.args.get("page", 1, type=int)
     if search:
         search = request.args.get("search").capitalize()
-        
-    legendary=request.args.get("legendary")
-    generation=request.args.get("generation")
-    rank=request.args.get("rank")
-    pokemon_ = view_pokemons(pokemon_name,rank,legendary,generation,sort, order, search)
+
+    legendary = request.args.get("legendary")
+    generation = request.args.get("generation")
+    rank = request.args.get("rank")
+    pokemon_ = view_pokemons(
+        pokemon_name, rank, legendary, generation, sort, order, search
+    )
     pokemon_ = pokemon_.paginate(page=page_num, per_page=limit, error_out=False)
     r = []
     for i in pokemon_:
@@ -168,7 +166,7 @@ def view(pokemon_name=None):
 
         r.append(dict_)
 
-    dict__= {"x": r}
+    dict__ = {"x": r}
     return {
         "success": True,
         "pokemon": dict__,
@@ -178,8 +176,7 @@ def view(pokemon_name=None):
 
 
 @pokemonapi.route("/up-date/<pokemon_name>", methods=["PATCH"])
-def pokemon_update(pokemon_name:dict,pokemons:list):
-
+def pokemon_update(pokemon_name: dict, pokemons: list):
     """
 
     Payload:
@@ -193,28 +190,22 @@ def pokemon_update(pokemon_name:dict,pokemons:list):
     #     "Legendary":True or False
 
     """
-    
+
     payloads = request.json
-    if type(payloads)==dict:
-    
+    if type(payloads) == dict:
         result = update_pokemon(pokemon_name, payloads)
         return result
-    if type(payloads)==list:
-        pokemons=request.json
-        model_name="pokemons"
-        upsert_status=upsert_do_update(model_name,pokemons)
-        return {
-            "success":True
-            **upsert_status,
-            "pokemons":pokemons
-        }
-
+    if type(payloads) == list:
+        pokemons = request.json
+        model_name = "pokemons"
+        upsert_status = upsert_do_update(model_name, pokemons)
+        return {"success": True**upsert_status, "pokemons": pokemons}
 
 
 @pokemonapi.route("/<string:name>", methods=["DELETE"])
 def del_pokemon(name=None):
     print(name)
-    matched_pokemon = Pokemon.query.filter_by(name=name.lower()).first()
+    matched_pokemon = Pokemon.query.filter_by(name=name.capitalize()).first()
     if not matched_pokemon:
         raise PokemonException(f"no record found in the {Pokemon.__tablename__} table")
 
@@ -246,7 +237,7 @@ def update_object(editable_keys, object_to_update, params):
     print(type(params))
     for key in params.keys():
         if key in editable_keys:
-            setattr(object_to_update,key,params[key])
+            setattr(object_to_update, key, params[key])
             # print(object_to_update)
     new_obj = add_object(object_to_update)
     return new_obj
@@ -279,7 +270,7 @@ def view_pokemons(
     if pokemon_name:
         match_pokemon = Pokemon.query.filter_by(name=pokemon_name.capitalize())
         return match_pokemon
-        
+
         if not match_data:
             raise PokemonException(
                 f"Pokemon {pokemon_name} doesn't exist.",
@@ -287,16 +278,16 @@ def view_pokemons(
             )
     if legendary:
         print(legendary)
-        match_data=Pokemon.query.filter_by(legendary=legendary)
+        match_data = Pokemon.query.filter_by(legendary=legendary)
         # print(match_data)
         return match_data
     if rank:
-        match_record=Pokemon.query.filter_by(rank=rank)
+        match_record = Pokemon.query.filter_by(rank=rank)
         # print(match_record)
         return match_record
-    
+
     if generation:
-        match_pokemon=Pokemon.query.filter_by(generation=generation)
+        match_pokemon = Pokemon.query.filter_by(generation=generation)
         return match_pokemon
 
     pokemon = Pokemon.query

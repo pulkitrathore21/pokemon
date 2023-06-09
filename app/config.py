@@ -6,6 +6,6 @@ SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://admin:1234@localhost:5432/pokem
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-PAGE_LIMIT = 20
+PAGE_LIMIT = 10
 
 DEBUG = True

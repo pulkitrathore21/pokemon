@@ -8,24 +8,24 @@ from app import db, ma
 class Pokemon(db.Model):
     __tablename__ = "pokemon_table"
     id: int = db.Column(db.Integer, primary_key=True)
-    rank: int = db.Column(db.Integer)
-    name: str = db.Column(db.String(100))
-    type_1: str = db.Column(db.String(100))
-    type_2: str = db.Column(db.String(100))
-    HP: int = db.Column(db.Integer)
-    Defense: int = db.Column(db.Integer)
-    total: int = db.Column(db.Integer)
-    attack: int = db.Column(db.Integer)
-    sp_atk: int = db.Column(db.Integer)
+    rank: int = db.Column(db.Integer,nullable=False)
+    name: str = db.Column(db.String(100), unique=True,nullable=False)
+    type_1: str = db.Column(db.String(100),nullable=False)
+    type_2: str = db.Column(db.String(100),nullable=False)
+    hp: int = db.Column(db.Integer,nullable=False)
+    defense: int = db.Column(db.Integer,nullable=False)
+    total: int = db.Column(db.Integer,nullable=False)
+    attack: int = db.Column(db.Integer,nullable=False)
+    sp_atk: int = db.Column(db.Integer,nullable=False)
     sp_def: int = db.Column(db.Integer)
-    speed: int = db.Column(db.Integer)
+    speed: int = db.Column(db.Integer,nullable=False)
     generation: int = db.Column(db.Integer)
     legendary: bool = db.Column(db.Boolean)
 
     def get_editable_fields(self):
         return (
-            "HP",
-            "Defense",
+            "hp",
+            "defense",
             "attack",
             "sp_atk",
             "sp_def",

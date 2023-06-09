@@ -18,6 +18,6 @@ except Exception as e:
 app.config.from_pyfile("config.py")
 db.init_app(app)
 
-from .models import Pokemon
+
 
 app.app_context().push()

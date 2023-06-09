@@ -69,8 +69,7 @@ def new_pokemon():
     speed = request.json.get("Speed")
     generation = request.json.get("Generation")
     legendary = request.json.get("Legendary")
-    try:
-        pokemon_ = Pokemon(
+    pokemon_ = Pokemon(
             rank=rank,
             name=name,
             type_1=type_1,
@@ -85,6 +84,8 @@ def new_pokemon():
             generation=generation,
             legendary=legendary,
         )
+    try:
+
         db.session.add(pokemon_)
         db.session.commit()
         serialized_data = pokemon_schema.dump(pokemon_)
@@ -99,10 +100,7 @@ def new_pokemon():
 
     except IntegrityError as e:
         db.session.rollback()
-        return (
-            jsonify({"success": False, "error": "this pokemon id  is already there "}),
-            404,
-        )
+        return {"success":"false","error":e},404
 
 
 @pokemonapi.route("/", methods=["GET"])
@@ -211,9 +209,9 @@ def pokemon_update():
         "Legendary":True or False
 
     """
-mon_data = request.json.get("items")
+
+    pokemon_data = request.json.get("items")
     if not pokemon_data:
-    poke
         return {"error": "data no found"}, 404
 
     query = insert(Pokemon).values(pokemon_data)
@@ -256,7 +254,6 @@ def del_pokemon(pokemon_id=None,type_1=None):
 
     else:
         pokemon_ = request.json.get("pokemon_ids")
-        print(pokemon_)
         for item in pokemon_:
             pokemons = pokemon_query.filter(Pokemon.id == item).first()
             if pokemons:

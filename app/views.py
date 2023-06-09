@@ -107,8 +107,7 @@ def new_pokemon():
 
 @pokemonapi.route("/", methods=["GET"])
 @pokemonapi.route("/<int:id>", methods=["GET"])
-# @pokemonapi.route("/<string:type_1>",methods=["GET"])
-def views(id=None, type_1=None):
+def views(id=None):
     """if I provide the name of the pokemon and then it returns single
     match records other wise this function  fetched all the records with pagination
     of database
@@ -141,7 +140,7 @@ def views(id=None, type_1=None):
     if id:
         pokemon = pokemon.filter(Pokemon.id == id)
         if not pokemon:
-            raise PokemonException(
+            raise RecordNotFoundError(
                 f"Pokemon with id doesn't exist in {Pokemon.__tablename__} table.", 200
             )
     if type_1:
@@ -175,7 +174,7 @@ def views(id=None, type_1=None):
     records = pokemons.items
 
     if len(records) == 0:
-        raise PokemonException(f"No records found in the {Pokemon.__tablename__}", 204)
+        raise RecordNotFoundError(f"No records found in the {Pokemon.__tablename__}", 204)
     if pokemons.has_next:
         next_url = url_for("pokemon_api.views", page=pokemons.next_num)
     else:
@@ -194,8 +193,8 @@ def views(id=None, type_1=None):
     }
 
 
-@pokemonapi.route("/<pokemon_id>", methods=["PUT", "POST"])
-def pokemon_update(pokemon_id=None):
+@pokemonapi.route("/", methods=["PUT", "POST"])
+def pokemon_update():
     """
     The API updates if the pokemon is already exist,
     if pokemon is not exist then it will insert new pokemon.
@@ -212,9 +211,9 @@ def pokemon_update(pokemon_id=None):
         "Legendary":True or False
 
     """
-
-    pokemon_data = request.json.get("items")
+mon_data = request.json.get("items")
     if not pokemon_data:
+    poke
         return {"error": "data no found"}, 404
 
     query = insert(Pokemon).values(pokemon_data)
@@ -249,8 +248,8 @@ def pokemon_update(pokemon_id=None):
 # API for deleting the record by id column name
 @pokemonapi.route("/<pokemon_id>", methods=["DELETE"])
 @pokemonapi.route("/more-pokemons", methods=["DELETE"])
-# @pokemonapi.route("/<string:name>", methods=["DELETE"])
-def del_pokemon(pokemon_id=None):
+
+def del_pokemon(pokemon_id=None,type_1=None):
     pokemon_query = Pokemon.query
     if pokemon_id:
         pokemon_ = (pokemon_id,)
@@ -292,9 +291,9 @@ def load_json():
             type_1=item.get("Type 1"),
             type_2=item.get("Type 2"),
             total=item.get("Total"),
-            HP=item.get("HP"),
+            hp=item.get("HP"),
             attack=item.get("Attack"),
-            Defense=item.get("Defense"),
+            defense=item.get("Defense"),
             sp_atk=item.get("Sp. Atk"),
             sp_def=item.get("Sp. Def"),
             speed=item.get("Speed"),

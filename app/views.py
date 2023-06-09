@@ -131,7 +131,7 @@ def views(id=None,type_1=None):
     type_1 = request.args.get("type_1")
     type_2 = request.args.get("type_2")
     generation = request.args.get("generation", type=int)
-        
+
     pokemon = Pokemon.query
     if id:
         pokemon = pokemon.filter(Pokemon.id == id)
@@ -187,9 +187,9 @@ def views(id=None,type_1=None):
     }
 
 
-# @pokemonapi.route("/",methods=["PUT"])
+
 @pokemonapi.route("/", methods=["PUT"])
-@pokemonapi.route("/<pokemon_id>", methods=["PUT"])
+@pokemonapi.route("/<pokemon_id>", methods=["PUT","POST"])
 def pokemon_update(pokemon_id=None):
     """
     The API updates if the pokemon is already exist,
@@ -249,23 +249,25 @@ def pokemon_update(pokemon_id=None):
 
 # API for deleting the record by id column name
 @pokemonapi.route("/<pokemon_id>", methods=["DELETE"])
-@pokemonapi.route("", methods=["DELETE"])
+@pokemonapi.route("/more-pokemons", methods=["DELETE"])
 # @pokemonapi.route("/<string:name>", methods=["DELETE"])
-def del_pokemon(pokemon_ids=None):
+def del_pokemon(pokemon_id=None):
     pokemon_query=Pokemon.query
     if pokemon_id :
-        ids=(id,)
+        pokemon_=(pokemon_id,)
 
     else:
-        pokemon_id =request.json.get("pokemon_ids")
-        for item in pokemon_id:
+        pokemon_=request.json.get("pokemon_ids")
+        print(pokemon_)
+        for item in pokemon_:
             pokemons=pokemon_query.filter(Pokemon.id==item).first()
             if pokemons:
                 db.session.delete(pokemons)
                 db.session.commit()
-                return {"success":True,"pokemon":pokemons,"message":f"deleted successfully with{ids}"} 
-        else:
-            raise RecordNotFoundError(f"No record with this id",400)
+                return {"success":True,"pokemon":pokemons,"message":f"deleted successfully with{item}"} 
+            else:
+                raise RecordNotFoundError(f"No record with this id",400)
+    
     
     
 
@@ -274,6 +276,8 @@ def del_pokemon(pokemon_ids=None):
 def load_into_db():
     res = load_json()
     return res
+
+
 
 
 def load_json():

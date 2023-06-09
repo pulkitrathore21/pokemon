@@ -67,7 +67,7 @@ def add_object(obj):
     return updated_object, 200
 
 
-#written function for updating single object
+# written function for updating single object
 def update_object(pokemon_id, editable_keys, object_to_update, params):
     params = params["items"][0]
 
